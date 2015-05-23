@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        canvas {
+            /*border: solid 1px red;*/
+            margin: 2px;
+            background-color: white;
+        }
+        body {
+            background-color: gray;
+            margin: 0;
+        }
+        div {
+            margin-bottom: -4px;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    
+    function drawGlyphs(data) {
+        // TODO: use react
+        var size = 80;
+        for (var i = 0x0000; i <= 0x024F; i++) {
+            var y = Math.floor(i / 16);
+            var x = i % 16;
+            if (x === 0) {
+                var row = document.createElement('div');
+                document.body.appendChild(row);
+            }
+            var canvas = document.createElement('canvas');
+            canvas.id = String(i);
+            canvas.width = size;
+            canvas.height = size;
+
+            var ctx = canvas.getContext('2d');
+
+            var hex = "0x" + ("0000" + i.toString(16)).substr(-4);
+            if (hex in data) {
+                ctx.fillStyle = "black";
+            } else {
+                ctx.fillStyle = "gray";
+            }
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.font = '50px comic sans ms';
+            ctx.fillText(String.fromCharCode(i), 40, 40);
+            row.appendChild(canvas);
+        }
+    }
+    
+    var unit_per_em = 2048;
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'latin.json', true);
+    xhr.responseType = 'json';
+
+    xhr.onload = function(e) {
+        if (this.status === 200) {
+            console.log(this.response);
+            drawGlyphs(this.response);
+        }
+    };
+    
+    xhr.send();
+    
+
+</script>
