@@ -23,11 +23,68 @@
 </body>
 </html>
 <script>
+    function toHex(number) {
+        return "0x" + ("0000" + number.toString(16)).substr(-4);
+    }
+    
+    CanvasRenderingContext2D.prototype.dot = function(x,y,r) {
+        this.beginPath();
+        this.arc(x, y, r, 0, 2 * Math.PI, false);
+        this.fill();
+    };
+    
+    var largeCanvas = document.createElement('canvas');
+    largeCanvas.width = 512;
+    largeCanvas.height = 512;
+    largeCanvas.style.position = 'absolute';
+    largeCanvas.style.left = '750px';
+    
+    document.body.appendChild(largeCanvas);
+    
+    function drawLargeGlyph(metrics, code) {
+        var ctx = largeCanvas.getContext('2d');
+        var size = 512;
+        ctx.clearRect(0,0,size,size);
+        ctx.fillStyle = 'black';
+//        ctx.textBaseline = 'middle';
+//        ctx.textAlign = 'center';
+
+        var k = 0.6 * size / unit_per_em;
+
+        // origin
+        var x = size / 4;
+        var y = 3 * size / 4;
+        
+        ctx.font = (0.6 * size) + 'px comic sans ms';
+        ctx.fillText(String.fromCharCode(code), x, y);
+        
+        // glyph bounding box
+        ctx.strokeStyle = 'red';
+        var width = k * metrics.width;
+        var height = k * metrics.height;
+        var bearingX = k * metrics.bearingX;
+        var bearingY = k * metrics.bearingY;
+        
+        // - bearingY b/c the coordinate system if flipped
+        ctx.strokeRect(x + bearingX, y - bearingY, width, height);
+        
+        // em bounding box
+        ctx.strokeStyle = 'blue';
+        var ascender = k * 2257;
+        var descender = k * -597;
+        ctx.strokeRect(x, y - ascender, k * 2048, ascender - descender);
+        
+        ctx.fillStyle = 'black';
+        ctx.dot(x, y, 5);
+        
+        ctx.dot(x + k * metrics.advance, y, 5);
+    }
     
     function drawGlyphs(data) {
         // TODO: use react
-        var size = 80;
-        for (var i = 0x0000; i <= 0x024F; i++) {
+        var size = 40;
+//        for (var i = 0x0000; i <= 0x024F; i++) {
+        for (var i = 0x0370; i <= 0x03FF; i++) {
             var y = Math.floor(i / 16);
             var x = i % 16;
             if (x === 0) {
@@ -35,22 +92,31 @@
                 document.body.appendChild(row);
             }
             var canvas = document.createElement('canvas');
-            canvas.id = String(i);
+            var id = toHex(i);
+            canvas.id = id;
             canvas.width = size;
             canvas.height = size;
+            
+            canvas.addEventListener('click', function (e) {
+                console.log(this.id);
+                var metrics = data[this.id];
+                var code = parseInt(this.id, 16);
+                drawLargeGlyph(metrics, code);
+            });
+            
+            canvas.setAttribute("title", id)
 
             var ctx = canvas.getContext('2d');
 
-            var hex = "0x" + ("0000" + i.toString(16)).substr(-4);
-            if (hex in data) {
+            if (id in data) {
                 ctx.fillStyle = "black";
             } else {
                 ctx.fillStyle = "gray";
             }
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
-            ctx.font = '50px comic sans ms';
-            ctx.fillText(String.fromCharCode(i), 40, 40);
+            ctx.font = (0.6 * size) + 'px comic sans ms';
+            ctx.fillText(String.fromCharCode(i), size / 2, size / 2);
             row.appendChild(canvas);
         }
     }
@@ -58,7 +124,7 @@
     var unit_per_em = 2048;
     
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'latin.json', true);
+    xhr.open('GET', 'greek.json', true);
     xhr.responseType = 'json';
 
     xhr.onload = function(e) {
