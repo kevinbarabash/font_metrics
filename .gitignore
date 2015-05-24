@@ -3,3 +3,4 @@ node_modules
 fttest
 *.o
 Comic Sans MS.ttf
+build/bundle.*
