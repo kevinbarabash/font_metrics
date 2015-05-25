@@ -12,17 +12,29 @@ class Tile extends React.Component {
         color: 'black'
     };
 
-    componentDidMount() {
+    drawTile(props) {
         var canvas = React.findDOMNode(this);
         var ctx = canvas.getContext('2d');
+        var size = props.size;
+
+        ctx.clearRect(0, 0, size, size);
 
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
         ctx.font = '30px comic sans ms';
-        ctx.fillStyle = this.props.color;
+        ctx.fillStyle = props.color;
 
-        var size = this.props.size;
-        ctx.fillText(this.props.children, size / 2, size / 2);
+        ctx.fillText(props.children, size / 2, size / 2);
+    }
+
+    componentDidMount() {
+        this.drawTile(this.props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.children !== nextProps.children) {
+            this.drawTile(nextProps);
+        }
     }
 
     handleClick = () => {

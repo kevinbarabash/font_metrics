@@ -18,17 +18,28 @@ async function get(url) {
     }
 }
 
+var block_ranges = {
+    'basic-latin': [0x0000, 0x007F],
+    'latin-1': [0x0080, 0x00FF],
+    'greek': [0x0370, 0x03FF],
+    'math-operators': [0x2200, 0x22FF]
+};
+
 class FontViewer extends React.Component {
 
     state = {
         data: null,
-        selectedGlyph: null
+        selectedGlyph: null,
+        begin: 0,
+        end: 0
     };
 
     componentDidMount() {
+        var block = 'basic-latin';
         (async () => {
-            var data = await get('../json/math-operators.json');
-            this.setState({ data });
+            var data = await get(`../json/${block}.json`);
+            var [begin, end] = block_ranges[block];
+            this.setState({ data, begin, end });
         })();
     }
 
@@ -36,31 +47,61 @@ class FontViewer extends React.Component {
         this.setState({ selectedGlyph: id });
     };
 
+    onChange = (e) => {
+        var block = e.target.selectedOptions[0].value;
+        (async () => {
+            var data = await get(`../json/${block}.json`);
+            var [begin, end] = block_ranges[block];
+            this.setState({ data, begin, end });
+        })();
+    };
+
     render() {
 
-        var style = {
+        var horizontalStyle = {
             display: 'flex',
             flexDirection: 'horizontal',
             alignItems: 'flex-start'
         };
 
+        var verticalStyle = {
+            flexDirection: 'vertical'
+        };
+
+        var labelStyle = {
+            color: 'black',
+            fontFamily: 'sans-serif',
+            marginRight: 8
+        };
+
         var tiles = [];
 
         if (this.state.data) {
-            var data = this.state.data;
+            var { data, begin, end } = this.state;
 
-            for (var i = 0x2200; i <= 0x22FF; i++) {
+            for (var i = begin; i <= end; i++) {
                 var id = toHex(i);
                 var color = id in data ? 'black' : 'gray';
-                tiles.push(<Tile id={id} size={50} color={color} onClick={this.clickHandler}>
+                tiles.push(<Tile key={id} id={id} size={50} color={color} onClick={this.clickHandler}>
                     {String.fromCodePoint(i)}
                 </Tile>);
             }
         }
 
-        return <div style={style}>
-            <Grid columns={16}>{tiles}</Grid>
-            <GlyphView size={512} glyph={this.state.selectedGlyph} data={this.state.data}/>
+        return <div style={verticalStyle}>
+            <div style={{display:'flex', marginBottom:16}}>
+                <label style={labelStyle}>Unicode Block:</label>
+                <select onChange={this.onChange}>
+                    <option>basic-latin</option>
+                    <option>latin-1</option>
+                    <option>greek</option>
+                    <option>math-operators</option>
+                </select>
+            </div>
+            <div style={horizontalStyle}>
+                <Grid columns={16}>{tiles}</Grid>
+                <GlyphView size={512} glyph={this.state.selectedGlyph} data={this.state.data}/>
+            </div>
         </div>;
     }
 }

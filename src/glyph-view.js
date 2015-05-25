@@ -68,7 +68,9 @@ class GlyphView extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.drawGlyph(nextProps);
+        if (this.props.glyph !== nextProps.glyph) {
+            this.drawGlyph(nextProps);
+        }
     }
 
     render() {
