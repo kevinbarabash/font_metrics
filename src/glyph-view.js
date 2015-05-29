@@ -19,20 +19,21 @@ class GlyphView extends React.Component {
     drawGlyph(props) {
         var canvas = React.findDOMNode(this);
         var ctx = canvas.getContext('2d');
-        var code = parseInt(props.glyph, 16);
+        var code = props.glyph;
         var size = props.size;
         var unit_per_em = 2048;
 
         ctx.clearRect(0,0,size,size);
         ctx.fillStyle = 'black';
 
-        var k = 0.6 * size / unit_per_em;
+        var fontSize = 0.6 * size;
+        var k = fontSize / unit_per_em;
 
         // origin
         var x = size / 4;
         var y = 3 * size / 4;
 
-        ctx.font = (0.6 * size) + 'px comic sans ms';
+        ctx.font = fontSize + 'px comic sans ms';
         ctx.fillText(String.fromCharCode(code), x, y);
 
         if (!props.data) {

@@ -36,7 +36,7 @@ void write_metrics(const char *filename, int first, int last) {
         FT_GlyphSlot slot = face->glyph;
         FT_Glyph_Metrics metrics = slot->metrics;
 
-        fprintf(fp, "  \"%#06x\": {\n", i);
+        fprintf(fp, "  \"%d\": {\n", i);
         fprintf(fp, "    \"width\": %ld,\n", metrics.width);
         fprintf(fp, "    \"height\": %ld,\n", metrics.height);
         fprintf(fp, "    \"advance\": %ld,\n", metrics.horiAdvance);

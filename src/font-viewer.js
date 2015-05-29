@@ -5,10 +5,6 @@ var GlyphView = require('./glyph-view.js');
 
 var $ = require('../node_modules/jquery/dist/jquery.js');
 
-function toHex(number) {
-    return "0x" + ("0000" + number.toString(16)).substr(-4);
-}
-
 var cache = {};
 async function get(url) {
     if (url in cache) {
@@ -80,9 +76,8 @@ class FontViewer extends React.Component {
             var { data, begin, end } = this.state;
 
             for (var i = begin; i <= end; i++) {
-                var id = toHex(i);
-                var color = id in data ? 'black' : 'gray';
-                tiles.push(<Tile key={id} id={id} size={50} color={color} onClick={this.clickHandler}>
+                var color = i in data ? 'black' : 'gray';
+                tiles.push(<Tile key={i} id={i} size={50} color={color} onClick={this.clickHandler}>
                     {String.fromCodePoint(i)}
                 </Tile>);
             }
