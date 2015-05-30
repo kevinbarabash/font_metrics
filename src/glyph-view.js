@@ -13,7 +13,8 @@ class GlyphView extends React.Component {
     static propTypes = {
         size: PropTypes.number.isRequired,
         glyph: PropTypes.string.isRequired,
-        metrics: PropTypes.object
+        metrics: PropTypes.object,
+        outlines: PropTypes.object
     };
 
     drawGlyph(props) {
@@ -34,13 +35,13 @@ class GlyphView extends React.Component {
         var y = 3 * size / 4;
 
         ctx.font = fontSize + 'px comic sans ms';
-        ctx.fillText(String.fromCharCode(code), x, y);
+        //ctx.fillText(String.fromCharCode(code), x, y);
 
-        if (!props.data) {
+        if (!props.metrics) {
             return;
         }
 
-        var metrics = props.data[props.glyph];
+        var metrics = props.metrics[props.glyph];
         if (!metrics) {
             return;
         }
@@ -63,6 +64,74 @@ class GlyphView extends React.Component {
 
         ctx.strokeStyle = 'blue';
         ctx.strokeRect(x + xMin, y - yMax, xMax - xMin, yMax - yMin);
+
+        ctx.beginPath();
+        this.props.outlines[code].forEach(outline => {
+            var r = 255 * Math.random() | 0;
+            var g = 255 * Math.random() | 0;
+            var b = 255 * Math.random() | 0;
+            var color = `rgb(${r}, ${g}, ${b})`;
+            //ctx.save();
+            ctx.fillStyle = color;
+            //outline.forEach(point => {
+            //    console.log(point);
+            //    if (point[2] === 1) {
+            //        ctx.dot(x + k * point[0], y - k * point[1], 3);
+            //    }
+            //});
+            //ctx.restore();
+
+            var point, nextPoint;
+            var tag, nextTag;
+
+            point = outline[0];
+
+            ctx.moveTo(x + k * point[0], y - k * point[1]);
+
+            var j = 1;
+            while (j < outline.length - 1) {
+                point = outline[j];
+                tag = point[2];
+                nextPoint = outline[j+1];
+                nextTag = nextPoint[2];
+
+                if (tag === 1) {
+                    ctx.lineTo(x + k * point[0], y - k * point[1]);
+                    j += 1;
+                } else if (tag === 0) {
+                    if (nextTag === 1) {
+                        ctx.quadraticCurveTo(x + k * point[0], y - k * point[1], x + k * nextPoint[0], y - k * nextPoint[1]);
+                        j += 2;
+                    } else if (nextTag === 0) {
+                        var onPoint = [];
+                        onPoint[0] = (point[0] + nextPoint[0]) / 2;
+                        onPoint[1] = (point[1] + nextPoint[1]) / 2;
+                        ctx.quadraticCurveTo(x + k * point[0], y - k * point[1], x + k * onPoint[0], y - k * onPoint[1]);
+                        j += 1;
+                    } else {
+                        throw "cubic tag";
+                    }
+                } else {
+                    throw "cubic tag";
+                }
+            }
+            if (j === outline.length - 1) {
+                point = outline[j];
+                tag = point[2];
+                if (tag === 1) {
+                    ctx.lineTo(x + k * point[0], y - k * point[1]);
+                } else if (tag === 0) {
+                    nextPoint = outline[0];
+                    ctx.quadraticCurveTo(x + k * point[0], y - k * point[1], x + k * nextPoint[0], y - k * nextPoint[1]);
+                } else {
+                    throw "cubic tag";
+                }
+            }
+        });
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'green';
+        ctx.stroke();
     }
 
     componentDidMount() {

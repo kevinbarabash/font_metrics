@@ -23,8 +23,10 @@ var block_ranges = {
 
 class FontViewer extends React.Component {
 
+    // TODO: put outlines and metrics in a flux store?
     state = {
-        data: null,
+        metrics: null,
+        outlines: null,
         selectedGlyph: null,
         begin: 0,
         end: 0
@@ -33,9 +35,10 @@ class FontViewer extends React.Component {
     componentDidMount() {
         var block = 'basic-latin';
         (async () => {
-            var data = await get(`../json/${block}.json`);
+            var metrics = await get(`../metrics/${block}.json`);
+            var outlines = await get(`../outlines/${block}.json`);
             var [begin, end] = block_ranges[block];
-            this.setState({ data, begin, end });
+            this.setState({ metrics, outlines, begin, end });
         })();
     }
 
@@ -46,9 +49,10 @@ class FontViewer extends React.Component {
     onChange = (e) => {
         var block = e.target.selectedOptions[0].value;
         (async () => {
-            var data = await get(`../json/${block}.json`);
+            var metrics = await get(`../metrics/${block}.json`);
+            var outlines = await get(`../outlines/${block}.json`);
             var [begin, end] = block_ranges[block];
-            this.setState({ data, begin, end });
+            this.setState({ metrics, outlines, begin, end });
         })();
     };
 
@@ -72,11 +76,11 @@ class FontViewer extends React.Component {
 
         var tiles = [];
 
-        if (this.state.data) {
-            var { data, begin, end } = this.state;
+        if (this.state.metrics) {
+            var { metrics, begin, end } = this.state;
 
             for (var i = begin; i <= end; i++) {
-                var color = i in data ? 'black' : 'gray';
+                var color = i in metrics ? 'black' : 'gray';
                 tiles.push(<Tile key={i} id={i} size={50} color={color} onClick={this.clickHandler}>
                     {String.fromCodePoint(i)}
                 </Tile>);
@@ -95,7 +99,11 @@ class FontViewer extends React.Component {
             </div>
             <div style={horizontalStyle}>
                 <Grid columns={16}>{tiles}</Grid>
-                <GlyphView size={512} glyph={this.state.selectedGlyph} data={this.state.data}/>
+                <GlyphView
+                    size={512}
+                    glyph={this.state.selectedGlyph}
+                    metrics={this.state.metrics}
+                    outlines={this.state.outlines}/>
             </div>
         </div>;
     }
