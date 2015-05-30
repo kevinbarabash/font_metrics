@@ -56,10 +56,13 @@ class GlyphView extends React.Component {
         ctx.strokeRect(x + bearingX, y - bearingY, width, height);
 
         // em bounding box
+        var xMin = k * -190;
+        var yMin = k * -639;
+        var xMax = k * 2430;
+        var yMax = k * 2257;
+
         ctx.strokeStyle = 'blue';
-        var ascender = k * 2257;
-        var descender = k * -597;
-        ctx.strokeRect(x, y - ascender, k * 2048, ascender - descender);
+        ctx.strokeRect(x + xMin, y - yMax, xMax - xMin, yMax - yMin);
     }
 
     componentDidMount() {

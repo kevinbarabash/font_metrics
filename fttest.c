@@ -64,16 +64,23 @@ int main(void) {
     }
 
     // TODO include this info in the JSON
-//    printf("units per EM %d\n", face->units_per_EM);
-//    printf("ascender %d\n", face->ascender);
-//    printf("descender %d\n", face->descender);
-//    printf("height %d\n", face->height);
-//    printf("number of glyphs: %ld\n", face->num_glyphs);
+    printf("units per EM %d\n", face->units_per_EM);
+    printf("ascender: %d\n", face->ascender);
+    printf("descender: %d\n", face->descender);
+    printf("height: %d\n", face->height);
+    printf("number of glyphs: %ld\n", face->num_glyphs);
+    printf("bbox:\n");
+    printf("  xMin: %ld\n", face->bbox.xMin);
+    printf("  yMin: %ld\n", face->bbox.yMin);
+    printf("  xMax: %ld\n", face->bbox.xMax);
+    printf("  yMax: %ld\n", face->bbox.yMax);
+    printf("underline_thickness: %d\n", face->underline_thickness);
+    printf("underline_position: %d\n", face->underline_position);
 
-    write_metrics("basic-latin.json", 0x0000, 0x007F);
-    write_metrics("latin-1.json", 0x0080, 0x00FF);
-    write_metrics("greek.json", 0x0370, 0x03FF);
-    write_metrics("math-operators.json", 0x2200, 0x22FF);
+    write_metrics("json/basic-latin.json", 0x0000, 0x007F);
+    write_metrics("json/latin-1.json", 0x0080, 0x00FF);
+    write_metrics("json/greek.json", 0x0370, 0x03FF);
+    write_metrics("json/math-operators.json", 0x2200, 0x22FF);
 
     // if (slot->format == FT_GLYPH_FORMAT_OUTLINE) {
     //   printf("outline\n");
