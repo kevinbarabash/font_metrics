@@ -1,8 +1,16 @@
+import argparse
 import json
 
 from fontTools.ttLib import TTFont
 
-font_info = TTFont("Comic Sans MS.ttf")
+parser = argparse.ArgumentParser(
+    description='Get glyph metrics from a TrueType font')
+parser.add_argument(
+    'input_file', type=str, help='the font file to read')
+
+args = parser.parse_args()
+
+font_info = TTFont(args.input_file)
 
 basic_latin = range(0x0020, 0x007F)
 latin_1 = range(0x0080, 0x00FF)
