@@ -31,6 +31,7 @@ for t in font_info['cmap'].tables:
 
 glyf = font_info["glyf"]
 hmtx = font_info["hmtx"]
+head = font_info["head"]
 
 glyph_metrics = {}
 
@@ -56,5 +57,10 @@ for k, v in cmap.iteritems():
         "height": height
     }
 
-print json.dumps(glyph_metrics, indent=4, sort_keys=True)
+font_metrics = {
+    "unitsPerEm": head.unitsPerEm,
+    "glyphMetrics": glyph_metrics
+}
+
+print json.dumps(font_metrics, indent=4, sort_keys=True)
 
